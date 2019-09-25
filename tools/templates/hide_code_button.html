@@ -1,0 +1,31 @@
+<div id="codeButtonContainer">
+    <style>
+        #codeButton {
+          background-color: #3D3C3A;
+          border: none;
+          color: white;
+          padding: 10px;
+          text-decoration: none;
+          position: fixed;
+          bottom:0; 
+          right:10px;
+        }
+    </style>  
+    <script>
+        code_show=true; 
+        function code_toggle() {
+            if (code_show){
+                $('div.input').hide();
+                $('input#codeButton').val('Show Python code')
+            } else {
+                $('div.input').show();
+                $('input#codeButton').val('Hide Python code')
+            }
+            code_show = !code_show
+        } 
+        $( document ).ready(code_toggle);
+    </script>
+    <form action="javascript:code_toggle()">
+        <input id="codeButton" type="submit" value="Show Python code">
+    </form>
+</div>
