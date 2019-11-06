@@ -1,0 +1,10 @@
+- Multisets
+- Functorialiteit
+- Probability distributions
+- Frequentist learning (Normalisation)
+- Channels
+- Parallel products (Multisets en distributie)
+- 1.9
+
+
+Vooral voorbeeeldne
