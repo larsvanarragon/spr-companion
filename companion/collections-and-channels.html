@@ -13132,11 +13132,13 @@ div#notebook {
     <form action="javascript:code_toggle()">
         <input id="codeButton" type="submit" value="Show Python code">
     </form>
-</div>	<script type="text/javascript">
-		$('body').on("DOMSubtreeModified", function() {
-			MathJax.Hub.Queue(["Typeset", MathJax.Hub, this]);
-		});
-	</script>
+</div>
+<script type="text/javascript">
+    $('body').on("DOMSubtreeModified", function() {
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, this]);
+        window.onload();
+    });
+</script>
   <div tabindex="-1" id="notebook" class="border-box-sizing">
     <div class="container">
       
@@ -13147,15 +13149,40 @@ div#notebook {
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Collections-and-Channels">Collections and Channels<a class="anchor-link" href="#Collections-and-Channels">&#182;</a></h1><p>This</p>
+<h1 id="Collections-and-Channels">Collections and Channels<a class="anchor-link" href="#Collections-and-Channels">&#182;</a></h1><p>The following sections will elaborate on the basics that are covered in this chapter. It will give examples for several of the topics covered in the Collections and Channels chapter of the book.</p>
 <h2 id="Contents">Contents<a class="anchor-link" href="#Contents">&#182;</a></h2><ol>
-<li><a href="#Cartesian-Products">Cartesian Products</a><ol>
-<li><a href="#Functions-&amp;-Function-Composition">Functions &amp; Function Composition</a></li>
-<li><a href="#Projections">Projections</a></li>
+<li><a href="#Multisets">Multisets</a><ol>
+<li><a href="#Simple-functorality">Simple functorality</a></li>
 </ol>
 </li>
+<li><a href="#Probability-Distributions">Probability Distributions</a><ol>
+<li><a href="#Biased-coin-distribution">Biased coin distribution</a></li>
+<li><a href="#Biased-dice-functorality">Biased dice functorality</a></li>
 </ol>
-<h2 id="Cartesian-Products">Cartesian Products<a class="anchor-link" href="#Cartesian-Products">&#182;</a></h2><p>Recall that we call a pair of elements $(x_1,x_2)$ a tuple. This pair can be extended into a triple: $(x_1,x_2,x_3)$, a $4$-tuple $(x_1,x_2,x_3,x_4)$ and so on. We can create an $n$-tuple for an arbitrary $n$ amount of elements as follows:</p>
+</li>
+<li><a href="#Frequentist-learning">Frequentist learning</a><ol>
+<li><a href="#A-bag-of-marbles">A bag of marbles</a></li>
+</ol>
+</li>
+<li><a href="#Parallel-products">Parallel products</a><ol>
+<li><a href="#Parallel-dices">Parallel dices</a></li>
+</ol>
+</li>
+<li><a href="#References">References</a></li>
+</ol>
+<h2 id="Multisets">Multisets<a class="anchor-link" href="#Multisets">&#182;</a></h2><h3 id="Simple-functorality">Simple functorality<a class="anchor-link" href="#Simple-functorality">&#182;</a></h3><p>Suppose we have a multiset containing several individuals of which we know their biological sex and age. The type of our multiset is then $\mathcal{M}(G \times A)$ where $G := \{F,M\}$ and $A := \{1,...,200\}$. Let's now take $\tau \in \mathcal{M}(G \times A)$ to be:</p>
+$$\begin{align*} 
+\tau =\ &amp;2|(F,14)\rangle + 1|(F,15)\rangle + 1|(F,17)\rangle + 3|(F,18)\rangle + 5|(F,20)\rangle + 2|(F,21)\rangle + 1|(F,23)\rangle\ +\\
+&amp;1|(M,14)\rangle + 1|(M,16)\rangle + 2|(M,17)\rangle + 1|(M,18)\rangle + 1|(M,20)\rangle + 1|(M,21)\rangle
+\end{align*}$$<p>This $\tau$ can represent for example the participants of a cooking course for adolescents. Now we can use the projections to show how many individuals of each gender and each age take this class:</p>
+$$\begin{align*} 
+\mathcal{M}(\pi_1)(\tau) &amp;= 15|F\rangle + 7|M\rangle\\
+\mathcal{M}(\pi_2)(\tau) &amp;= 3|14\rangle + 1|15\rangle + 1|16\rangle + 3|17\rangle + 4|18\rangle + 6|20\rangle + 3|21\rangle + 1|23\rangle
+\end{align*}$$<p>Since a multiset is functorial we can apply a function to it using $\mathcal{M}(f)(\tau)$. For example we can apply a function $next$ that 'ages' the class an entire year so that each participant now is one year older.</p>
+$$\begin{align*} 
+next &amp;:: (G\times A) \rightarrow (G\times A) \\
+next((g,a)) &amp;= (g,a+1)
+\end{align*}$$<p>Let's apply the function as follows: $\mathcal{M}(next)(\tau)$. Pressing the button 'Next' below will apply $\mathcal{M}(next)(\tau)$ once.</p>
 
 </div>
 </div>
@@ -13169,25 +13196,68 @@ div#notebook {
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">w</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="k">import</span> <span class="n">interactive_output</span><span class="p">,</span> <span class="n">Button</span><span class="p">,</span> <span class="n">Output</span>
 <span class="kn">import</span> <span class="nn">IPython.display</span> <span class="k">as</span> <span class="nn">d</span>
+<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
 
-<span class="n">isl</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">IntSlider</span><span class="p">(</span>
-    <span class="n">value</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-    <span class="nb">min</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-    <span class="nb">max</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
-    <span class="n">description</span><span class="o">=</span><span class="s1">&#39;$n:=$&#39;</span>
-<span class="p">)</span>
+<span class="n">M</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">F</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">ages</span> <span class="o">=</span> <span class="p">[</span><span class="mi">14</span><span class="p">,</span><span class="mi">15</span><span class="p">,</span><span class="mi">16</span><span class="p">,</span><span class="mi">17</span><span class="p">,</span><span class="mi">18</span><span class="p">,</span><span class="mi">19</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">21</span><span class="p">,</span><span class="mi">22</span><span class="p">,</span><span class="mi">23</span><span class="p">,</span><span class="mi">24</span><span class="p">,</span><span class="mi">25</span><span class="p">,</span><span class="mi">26</span><span class="p">,</span><span class="mi">27</span><span class="p">,</span><span class="mi">28</span><span class="p">]</span>
+    
+<span class="n">init_ms</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="mi">14</span><span class="p">)),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="mi">15</span><span class="p">)),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="mi">17</span><span class="p">)),</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="mi">18</span><span class="p">)),</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="mi">20</span><span class="p">)),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="mi">21</span><span class="p">)),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="mi">23</span><span class="p">)),</span>
+              <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="mi">14</span><span class="p">)),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="mi">16</span><span class="p">)),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="mi">17</span><span class="p">)),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="mi">18</span><span class="p">)),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="mi">20</span><span class="p">)),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="mi">21</span><span class="p">))]</span>
+<span class="n">ms</span> <span class="o">=</span> <span class="n">init_ms</span>
 
-<span class="k">def</span> <span class="nf">disp</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="n">xPair</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-        <span class="n">xPair</span> <span class="o">+=</span> <span class="s2">&quot;x_{&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;},&quot;</span>
-    <span class="n">d</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">Latex</span><span class="p">(</span><span class="s2">&quot;$&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;-tuple :=(&quot;</span> <span class="o">+</span> <span class="n">xPair</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;)$&quot;</span><span class="p">))</span>
+<span class="n">out</span> <span class="o">=</span> <span class="n">Output</span><span class="p">()</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Next&#39;</span><span class="p">,</span> <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">reset</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="k">def</span> <span class="nf">bool_to_gender</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">b</span> <span class="o">==</span> <span class="n">M</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;M&quot;</span>
+    <span class="k">if</span> <span class="n">b</span> <span class="o">==</span> <span class="n">F</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;F&quot;</span>
+
+<span class="k">def</span> <span class="nf">heights</span><span class="p">():</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">age</span> <span class="ow">in</span> <span class="n">ages</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ms</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">age</span><span class="p">:</span>
+                <span class="n">n</span> <span class="o">+=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">h</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">h</span>
+
+<span class="k">def</span> <span class="nf">next_button</span><span class="p">(</span><span class="n">button</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">ms</span><span class="p">,</span> <span class="n">reset</span>
+    <span class="k">if</span> <span class="n">reset</span><span class="p">:</span>
+        <span class="n">button</span><span class="o">.</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Next&#39;</span>
+        <span class="n">ms</span> <span class="o">=</span> <span class="n">init_ms</span>
+        <span class="n">reset</span><span class="o">=</span><span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>  
+        <span class="n">new_ms</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ms</span><span class="p">:</span>
+            <span class="n">new_ms</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)))</span>
+            <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span> <span class="o">==</span> <span class="mi">28</span><span class="p">:</span>
+                <span class="n">reset</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">button</span><span class="o">.</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Reset&#39;</span>
+        <span class="n">ms</span> <span class="o">=</span> <span class="n">new_ms</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">out</span><span class="p">:</span>
+        <span class="n">disp_latex</span><span class="p">()</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">nbi</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">ages</span><span class="p">,</span> <span class="n">heights</span><span class="p">()))</span>
     
-    
-<span class="n">output</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">interactive_output</span><span class="p">(</span><span class="n">disp</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">isl</span><span class="p">})</span>
-<span class="n">d</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">isl</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">disp_latex</span><span class="p">():</span>
+    <span class="n">std</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ms</span><span class="p">:</span>
+        <span class="n">std</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;|(&quot;</span> <span class="o">+</span> <span class="n">bool_to_gender</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;)\rangle +&quot;</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">Latex</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\tau =&quot;</span> <span class="o">+</span> <span class="n">std</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;$&quot;</span><span class="p">))</span>
+
+<span class="n">b</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">next_button</span><span class="p">)</span>
+<span class="n">d</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">out</span><span class="p">:</span>
+    <span class="n">disp_latex</span><span class="p">()</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">nbi</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">ages</span><span class="p">,</span> <span class="n">heights</span><span class="p">()))</span>
 </pre></div>
 
     </div>
@@ -13232,8 +13302,7 @@ div#notebook {
   </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Using this we can, as seen in the book, create Cartesian products out of any $n$ amount of sets as follows:</p>
-$$X_1 \times \dotsb \times X_n := \{(x_1,...,x_n)|x_1 \in X_1\ and\ \dotsb\ and\ x_n \in X_n\}$$<p>Now let's pick an $n$ and see what happens:</p>
+<p>Applying $next$ to our multiset $\tau$ only affects the age of the participants. When the button's text changes to 'Reset' pressing it will reset $\tau$ back to the value we defined at the beginning of this example.</p>
 
 </div>
 </div>
@@ -13247,27 +13316,96 @@ $$X_1 \times \dotsb \times X_n := \{(x_1,...,x_n)|x_1 \in X_1\ and\ \dotsb\ and\
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">w</span>
-<span class="kn">import</span> <span class="nn">IPython.display</span> <span class="k">as</span> <span class="nn">d</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Test cell to see how to import efprob as local library</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">module_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;../..&#39;</span><span class="p">))</span>
+<span class="k">if</span> <span class="n">module_path</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">module_path</span><span class="p">)</span>
+    
+<span class="kn">from</span> <span class="nn">efprob.efprob</span> <span class="k">import</span> <span class="o">*</span>
 
-<span class="n">isl</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">IntSlider</span><span class="p">(</span>
-    <span class="n">value</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-    <span class="nb">min</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-    <span class="nb">max</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
-    <span class="n">description</span><span class="o">=</span><span class="s1">&#39;$n:=$&#39;</span>
+<span class="n">rgb</span> <span class="o">=</span> <span class="n">State</span><span class="p">([</span><span class="mf">0.3</span><span class="p">,</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">0.5</span><span class="p">],</span> <span class="n">Space</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;R&#39;</span><span class="p">,</span><span class="s1">&#39;G&#39;</span><span class="p">,</span><span class="s1">&#39;B&#39;</span><span class="p">]))</span>
+<span class="nb">print</span><span class="p">(</span> <span class="n">rgb</span> <span class="p">)</span>
+
+<span class="c1"># X and Y are spaces</span>
+<span class="k">def</span> <span class="nf">chan</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">chan_fromklmap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">point_state</span><span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">Y</span><span class="p">),</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">x</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;H&#39;</span>
+    <span class="k">return</span> <span class="s1">&#39;T&#39;</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>0.3|R&gt; + 0.2|G&gt; + 0.5|B&gt;
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Probability-Distributions">Probability Distributions<a class="anchor-link" href="#Probability-Distributions">&#182;</a></h2><h3 id="Biased-coin-distribution">Biased coin distribution<a class="anchor-link" href="#Biased-coin-distribution">&#182;</a></h3><p>A multiset can also be generated using a function. Recall example 1.5.1 from the book, it defines a function $flip$ to parameterize a bias probability. We will use the following adaptation for $flip:[0,1]\rightarrow C$ with $C:=\{H,T\}$:</p>
+$$flip(r) := r|H\rangle + (1-r)|T\rangle$$<p>With this function a multiset can be generated that represents a biased coin toss. When $r$ changes, so do the chances of Heads or Tails. The following bar diagram shows the chances for either heads or tails, $r$ is changeable.</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="k">import</span> <span class="n">interactive_output</span><span class="p">,</span> <span class="n">FloatSlider</span>
+<span class="kn">from</span> <span class="nn">decimal</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
+
+<span class="c1"># Round down decimals to 2 positions</span>
+<span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="n">flip_rSlider</span> <span class="o">=</span> <span class="n">FloatSlider</span><span class="p">(</span>
+    <span class="n">value</span><span class="o">=</span><span class="mf">0.51</span><span class="p">,</span>
+    <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="nb">max</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">step</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s1">&#39;$$r:=$$&#39;</span>
 <span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">disp</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-    <span class="n">xPair</span><span class="p">,</span> <span class="n">xCart</span><span class="p">,</span> <span class="n">xIn</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-        <span class="n">xCart</span> <span class="o">+=</span> <span class="s2">&quot;X_{&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;} </span><span class="se">\\</span><span class="s2">times &quot;</span>
-        <span class="n">xPair</span> <span class="o">+=</span> <span class="s2">&quot;x_{&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;},&quot;</span>
-        <span class="n">xIn</span> <span class="o">+=</span> <span class="s2">&quot;x_{&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;} </span><span class="se">\\</span><span class="s2">in X_{&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;}\ and\ &quot;</span>
-    <span class="n">d</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">Latex</span><span class="p">(</span><span class="s2">&quot;$&quot;</span> <span class="o">+</span> <span class="n">xCart</span><span class="p">[:</span><span class="o">-</span><span class="mi">7</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;:=\{(&quot;</span> <span class="o">+</span> <span class="n">xPair</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;)|&quot;</span> <span class="o">+</span> <span class="n">xIn</span><span class="p">[:</span><span class="o">-</span><span class="mi">7</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;\}$&quot;</span><span class="p">))</span>
-    
-    
-<span class="n">output</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">interactive_output</span><span class="p">(</span><span class="n">disp</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">isl</span><span class="p">})</span>
-<span class="n">d</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">isl</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
+<span class="n">flip_options</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Heads or Tails&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;xlabel&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ylabel&#39;</span><span class="p">:</span> <span class="s1">&#39;Chance between 0 and 1 with 1 being 100%&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ylim&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.00</span><span class="p">,</span> <span class="mf">1.01</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">flip</span><span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">Latex</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;&#39;&#39;$$flip(&#39;&#39;&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;&#39;&#39;) := &#39;&#39;&#39;</span> <span class="o">+</span>
+                      <span class="nb">str</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;&#39;&#39;|H\rangle + &#39;&#39;&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">Decimal</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span><span class="o">-</span><span class="n">Decimal</span><span class="p">(</span><span class="n">r</span><span class="p">))</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;&#39;&#39;|T\rangle$$&#39;&#39;&#39;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">Decimal</span><span class="p">(</span><span class="n">r</span><span class="p">)),</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">Decimal</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span><span class="o">-</span><span class="n">Decimal</span><span class="p">(</span><span class="n">r</span><span class="p">))))</span>
+
+<span class="n">nbi</span><span class="o">.</span><span class="n">bar</span><span class="p">([</span><span class="s1">&#39;Heads&#39;</span><span class="p">,</span> <span class="s1">&#39;Tails&#39;</span><span class="p">],</span> <span class="n">flip</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="n">flip_rSlider</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">flip_options</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -13292,67 +13430,543 @@ $$X_1 \times \dotsb \times X_n := \{(x_1,...,x_n)|x_1 \in X_1\ and\ \dotsb\ and\
 
 </div>
 
-<div class="output_area">
-
-    
-
-
-
-  <div class="output_subarea output_widget_view ">
-    <button class="js-nbinteract-widget">
-      Loading widgets...
-    </button>
-  </div>
-
-</div>
-
 </div>
 </div>
 
   </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>For when $n=3$ it is easy to think of such a Cartesian product as a point in $3$d space, or for $n=4$ a point in $4$d space. This can exactly be the case when for example $X_1 = \dotsb = X_n = \rm I\!R$ (The set of all real numbers). However, when $n$ becomes bigger than 5 it is quite hard to visualize it this way. Instead, it is then possible to see such an $n$-tuple as an ordered list of $n$ elements.</p>
-<h3 id="Functions-&amp;-Function-Composition">Functions &amp; Function Composition<a class="anchor-link" href="#Functions-&amp;-Function-Composition">&#182;</a></h3><p>In Mathematics, a function $f$ from $X \rightarrow Y$ relates all elements $x \in X$ to exactly one other element $y\in Y$. Common terminology is to call $X$ the domain and $Y$ the codomain. For example the function '$square$' can be defined as follows:</p>
+<h3 id="Biased-dice-functorality">Biased dice functorality<a class="anchor-link" href="#Biased-dice-functorality">&#182;</a></h3><p>Let's again look at the functorality of a multiset. Suppose we have a set that represents all sides of an ordinary $6$-sided dice, $D6 := \{1, 2, 3, 4, 5, 6\}$ and recall $C := \{ H, T \}$. Then we can define the following uniform multiset for a dice using ket-notation:</p>
 $$\begin{align*} 
-square &amp;:: \rm I\!R \rightarrow \rm I\!R \\
-square (x) &amp;= x \cdot x
-\end{align*}$$<p>The top line states the type of the function, it shows from what the domain and codomain of the function is. In this case both the domain and codomain are the real numbers. It is also possible to define recursive functions in this notation like so:</p>
-$$\begin{align*} 
-factorial &amp;:: \rm I\!N \rightarrow \rm I\!N \\
-factorial(x) &amp;= 
-\left\{
+\varphi &amp;= \dfrac{1}{6}|1\rangle + \dfrac{1}{6}|2\rangle + \dfrac{1}{6}|3\rangle + \dfrac{1}{6}|4\rangle + \dfrac{1}{6}|5\rangle + \dfrac{1}{6}|6\rangle
+\end{align*}$$<p>With $\varphi \in \mathcal{M}(D6)$. Now suppose we have the following function $f$:</p>
+$$
+\begin{align*} 
+f &amp;: D6 \rightarrow C  \\
+f(x) &amp;= \left\{
 \begin{array}{ll}
-  1\ \text{if}\ n=0\\
-  x \cdot factorial(x-1)\ \text{otherwise}
+  H\ \text{if}\ x\ \text{is even}\\
+  T\ \text{otherwise}
 \end{array}
 \right.
-\end{align*}$$<p>This factorial function has as both domain and codomain the natural numbers. We usually denote a composition (i.e. a combination) of two functions with $f\circ g$ which can intuitively be thought of as $f$ after $g$. This composition is applied to an argument as follows: $(f\circ g)(x)$ for some $x$ which is defined as $f(g(x))$. For example
-$$\begin{align*}
-  (square\circ factorial)(3) &amp;=\\
-  square(factorial(3)) &amp;= \\
-  square(6) &amp;= 36
-\end{align*}$$
-Whereas if they are the other way around
-$$\begin{align*}
-  (factorial\circ square)(3) &amp;=\\
-  factorial(square(3)) &amp;= \\
-  factorial(9) &amp;= 362880
-\end{align*}$$</p>
-<h3 id="Projections">Projections<a class="anchor-link" href="#Projections">&#182;</a></h3><p>As seen in the book, this composition is applied to projections. Take for example $1.1$ which states:
-$$\pi_i\circ\langle f_1,...,f_n\rangle=f_i$$
-Let's apply it to some element $y\in Y$ and unfold the definitions to see exactly how this composition works.
-$$\begin{align*}
-  (\pi_i\circ\langle f_1,...,f_n\rangle)(y) &amp;= (\text{by definition of }\circ) \\
-  \pi_i(\langle f_1,...,f_n\rangle(y)) &amp;= (\text{by definition of }\langle f_1,...,f_n\rangle)\\
-  \pi_i(f_1(y),...,f_n(y)) &amp;= (\text{by definition of } f_i:Y\rightarrow X_i)\\
-  \pi_i(x_1,...,x_n) &amp;= x_i
-\end{align*}$$
-As is visible this would be equivalent to just applying $f_i$ to $y$.</p>
+\end{align*}
+$$<p>Now since $\mathcal{M}$ is functorial we can apply $\mathcal{M}(f)(\varphi)$ as following:</p>
+$$
+\begin{align*} 
+    \mathcal{M}(f)(\varphi) &amp;= \mathcal{M}(f)(\dfrac{1}{6}|1\rangle + \dfrac{1}{6}|2\rangle + \dfrac{1}{6}|3\rangle + \dfrac{1}{6}|4\rangle + \dfrac{1}{6}|5\rangle + \dfrac{1}{6}|6\rangle)\\
+    &amp;= \dfrac{1}{6}|f(1)\rangle + \dfrac{1}{6}|f(2)\rangle + \dfrac{1}{6}|f(3)\rangle + \dfrac{1}{6}|f(4)\rangle + \dfrac{1}{6}|f(5)\rangle + \dfrac{1}{6}|f(6)\rangle\\
+    &amp;= \dfrac{1}{6}|T\rangle + \dfrac{1}{6}|H\rangle + \dfrac{1}{6}|T\rangle + \dfrac{1}{6}|H\rangle + \dfrac{1}{6}|T\rangle + \dfrac{1}{6}|H\rangle\\
+    &amp;= \dfrac{3}{6}|T\rangle + \dfrac{3}{6}|H\rangle\\
+    &amp;= \dfrac{1}{2}|T\rangle + \dfrac{1}{2}|H\rangle\\
+\end{align*}
+$$<p>In this case we used the left definition of $\mathcal{M}(f)$ namely: $\mathcal{M}(\sum_i r_i|x_i\rangle)$. Suppose we have a way to accurately increase the chance of the dice to land on $6$. This can be represented by the following function $w:[0,5] \rightarrow \mathcal{M}(D6)$:</p>
+$$
+w(r) = \tfrac{1-\tfrac{r}{5}}{6}|1\rangle + \tfrac{1-\tfrac{r}{5}}{6}|2\rangle + \tfrac{1-\tfrac{r}{5}}{6}|3\rangle + \tfrac{1-\tfrac{r}{5}}{6}|4\rangle + \tfrac{1-\tfrac{r}{5}}{6}|5\rangle + \tfrac{1+r}{6}|6\rangle
+$$<p>Since the result of $w$ is an $x\in\mathcal{M}(D6)$ we can apply $\mathcal{M}(f)(x)$. This means that dependant on how weighted the dice is we have a higher change of it being even and thus a higher change to get $H$. This can be visualized as follows:</p>
 
 </div>
 </div>
 </div>
+
+  
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="k">import</span> <span class="n">interactive_output</span><span class="p">,</span> <span class="n">FloatSlider</span>
+<span class="kn">from</span> <span class="nn">decimal</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">IPython.display</span> <span class="k">as</span> <span class="nn">d</span>
+<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
+
+<span class="c1"># Round down decimals to 4 positions</span>
+<span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="n">w_rSlider</span> <span class="o">=</span> <span class="n">FloatSlider</span><span class="p">(</span>
+    <span class="n">value</span><span class="o">=</span><span class="mf">0.00</span><span class="p">,</span>
+    <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="nb">max</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">step</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s1">&#39;$$r:=$$&#39;</span>
+<span class="p">)</span>
+
+<span class="n">coin_options</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Chance for Heads or Tails&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ylabel&#39;</span><span class="p">:</span> <span class="s1">&#39;Chance between 0 and 1 with 1 being 100%&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ylim&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.00</span><span class="p">,</span> <span class="mf">1.01</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="n">dice_options</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Weighted 6-sided dice&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ylabel&#39;</span><span class="p">:</span> <span class="s1">&#39;Chance between 0 and 1 with 1 being 100%&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ylim&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.00</span><span class="p">,</span> <span class="mf">1.01</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">w_flip</span><span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+    <span class="n">even</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">weighted_dice</span><span class="p">(</span><span class="n">r</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">even</span> <span class="o">=</span> <span class="n">even</span> <span class="o">+</span> <span class="n">Decimal</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">even</span><span class="p">),</span><span class="nb">float</span><span class="p">(</span><span class="n">even</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">dice</span><span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+    <span class="n">ret_value</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">weighted_dice</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
+        <span class="n">ret_value</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">ret_value</span>
+
+<span class="k">def</span> <span class="nf">weighted_dice</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
+    <span class="n">ret_value</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">rdivfive</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="o">/</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">pip</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">7</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">pip</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+            <span class="n">ret_value</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">Decimal</span><span class="p">(</span><span class="n">r</span><span class="p">))</span><span class="o">/</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ret_value</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">rdivfive</span><span class="p">)</span><span class="o">/</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">ret_value</span>
+
+<span class="k">def</span> <span class="nf">w_disp</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="n">coin</span> <span class="o">=</span> <span class="n">w_flip</span><span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">Latex</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$\mathcal</span><span class="si">{M}</span><span class="s2">(f)(w(&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;)) = &quot;</span> <span class="o">+</span> 
+                          <span class="nb">str</span><span class="p">(</span><span class="n">Decimal</span><span class="p">(</span><span class="n">coin</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">quantize</span><span class="p">(</span><span class="n">Decimal</span><span class="p">(</span><span class="s1">&#39;.001&#39;</span><span class="p">),</span> <span class="n">rounding</span><span class="o">=</span><span class="n">ROUND_HALF_DOWN</span><span class="p">))</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;|T\rangle + &quot;</span> <span class="o">+</span>
+                          <span class="nb">str</span><span class="p">(</span><span class="n">Decimal</span><span class="p">(</span><span class="n">coin</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">quantize</span><span class="p">(</span><span class="n">Decimal</span><span class="p">(</span><span class="s1">&#39;.001&#39;</span><span class="p">),</span> <span class="n">rounding</span><span class="o">=</span><span class="n">ROUND_HALF_DOWN</span><span class="p">))</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;|H\rangle $&quot;</span><span class="p">))</span>
+    
+    <span class="n">dice</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;$w(&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;) = &quot;</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">weighted_dice</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>
+        <span class="n">dice</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;|&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;\rangle + &quot;</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">Latex</span><span class="p">(</span><span class="n">dice</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;$&quot;</span><span class="p">))</span>
+
+<span class="n">d</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">nbi</span><span class="o">.</span><span class="n">bar</span><span class="p">([</span><span class="s1">&#39;Tails&#39;</span><span class="p">,</span> <span class="s1">&#39;Heads&#39;</span><span class="p">],</span> <span class="n">w_flip</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="n">w_rSlider</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">coin_options</span><span class="p">))</span>
+<span class="n">d</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">nbi</span><span class="o">.</span><span class="n">bar</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">],</span> <span class="n">dice</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="n">w_rSlider</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">dice_options</span><span class="p">))</span>
+<span class="n">d</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">interactive_output</span><span class="p">(</span><span class="n">w_disp</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">w_rSlider</span><span class="p">}))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+  <div class="output_subarea output_widget_view ">
+    <button class="js-nbinteract-widget">
+      Loading widgets...
+    </button>
+  </div>
+
+</div>
+
+<div class="output_area">
+
+    
+
+
+
+  <div class="output_subarea output_widget_view ">
+    <button class="js-nbinteract-widget">
+      Loading widgets...
+    </button>
+  </div>
+
+</div>
+
+<div class="output_area">
+
+    
+
+
+
+  <div class="output_subarea output_widget_view ">
+    <button class="js-nbinteract-widget">
+      Loading widgets...
+    </button>
+  </div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Frequentist-learning">Frequentist learning<a class="anchor-link" href="#Frequentist-learning">&#182;</a></h2><h3 id="A-bag-of-marbles">A bag of marbles<a class="anchor-link" href="#A-bag-of-marbles">&#182;</a></h3><p>Suppose we have a bag containing $12$ marbles where $1$ is red, $3$ are gold, $4$ are silver and $4$ are bronze. This bag is represented by the multiset: $\tau = 1|R\rangle + 3|G\rangle + 4|S\rangle + 4|B\rangle$. When we now randomly take a marble from this bag we have chance to get either a red, gold, silver or bronze one. We can compute this chance by computing $Flrn(\tau) = 0.083|R\rangle + 0.25|G\rangle + 0.33|S\rangle + 0.33|B\rangle$. However, every time we take a marble from the bag the chance for each color changes. This is illustrated below, pressing the button will take a marble from the bag according to the chances.</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="k">import</span> <span class="n">Output</span><span class="p">,</span> <span class="n">Button</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
+<span class="kn">from</span> <span class="nn">decimal</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">random</span> <span class="k">import</span> <span class="n">randrange</span>
+
+<span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="n">initial_bag</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span><span class="s2">&quot;R&quot;</span><span class="p">),(</span><span class="mi">3</span><span class="p">,</span><span class="s2">&quot;G&quot;</span><span class="p">),(</span><span class="mi">4</span><span class="p">,</span><span class="s2">&quot;S&quot;</span><span class="p">),(</span><span class="mi">4</span><span class="p">,</span><span class="s2">&quot;B&quot;</span><span class="p">)]</span>
+<span class="n">marbles</span> <span class="o">=</span> <span class="n">initial_bag</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">amounts_left</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+    <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">marbles</span><span class="p">:</span>
+        <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">ret</span>
+
+<span class="k">def</span> <span class="nf">take_marble</span><span class="p">(</span><span class="n">bag</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">is_empty</span><span class="p">(</span><span class="n">bag</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;None&quot;</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">randrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">total</span><span class="p">(</span><span class="n">bag</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">nSoFar</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">r</span> <span class="o">&gt;</span> <span class="n">nSoFar</span><span class="p">:</span>
+        <span class="n">nSoFar</span> <span class="o">+=</span> <span class="n">bag</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">i</span> <span class="o">-=</span> <span class="mi">1</span>
+    <span class="n">bag</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">bag</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">bag</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">bag</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">do_button_pressed</span><span class="p">(</span><span class="n">bag</span><span class="p">,</span> <span class="n">button</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">is_empty</span><span class="p">(</span><span class="n">bag</span><span class="p">):</span>
+        <span class="n">reset_bag</span><span class="p">()</span>
+        <span class="n">button</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;Take a marble&#39;</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">take_marble</span><span class="p">(</span><span class="n">bag</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">is_empty</span><span class="p">(</span><span class="n">bag</span><span class="p">):</span>
+            <span class="n">button</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="s1">&#39;Put the marbles back&#39;</span>
+        <span class="k">return</span> <span class="n">m</span>
+    
+<span class="k">def</span> <span class="nf">reset_bag</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">marbles</span>
+    <span class="n">marbles</span> <span class="o">=</span> <span class="n">initial_bag</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    
+<span class="k">def</span> <span class="nf">is_empty</span><span class="p">(</span><span class="n">bag</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">bag</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span>
+
+<span class="k">def</span> <span class="nf">total</span><span class="p">(</span><span class="n">bag</span><span class="p">):</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">bag</span><span class="p">:</span>
+        <span class="n">r</span> <span class="o">+=</span> <span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">r</span>
+
+<span class="k">def</span> <span class="nf">conv_latex</span><span class="p">(</span><span class="n">bag</span><span class="p">):</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;$\tau = &quot;</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">bag</span><span class="p">:</span>
+        <span class="n">r</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;|&quot;</span> <span class="o">+</span> <span class="n">m</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;\rangle + &quot;</span>
+    <span class="k">return</span> <span class="n">r</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;$&quot;</span>
+
+<span class="k">def</span> <span class="nf">conv_normalised_latex</span><span class="p">(</span><span class="n">bag</span><span class="p">):</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;$Flrn(\tau) = &quot;</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">total</span><span class="p">(</span><span class="n">bag</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">bag</span><span class="p">:</span>
+        <span class="n">div</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">t</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">div</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="n">Decimal</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">div</span><span class="p">)</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;|&quot;</span> <span class="o">+</span> <span class="n">m</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;\rangle + &quot;</span>
+    <span class="k">return</span> <span class="n">r</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;$&quot;</span>
+
+<span class="n">bag_output</span> <span class="o">=</span> <span class="n">Output</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">disp_bag</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">do_button_pressed</span><span class="p">(</span><span class="n">marbles</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">bag_output</span><span class="p">:</span>
+        <span class="n">clear_output</span><span class="p">()</span>
+        <span class="n">display</span><span class="p">(</span><span class="n">Latex</span><span class="p">(</span><span class="n">conv_latex</span><span class="p">(</span><span class="n">marbles</span><span class="p">)))</span>
+        <span class="n">display</span><span class="p">(</span><span class="n">Latex</span><span class="p">(</span><span class="n">conv_normalised_latex</span><span class="p">(</span><span class="n">marbles</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">m</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">display</span><span class="p">(</span><span class="s2">&quot;Marble taken: &quot;</span> <span class="o">+</span> <span class="n">m</span><span class="p">)</span>
+
+<span class="n">bag_button</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s1">&#39;Take a marble&#39;</span><span class="p">,</span> <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">bag_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">disp_bag</span><span class="p">)</span>
+
+<span class="n">display</span><span class="p">(</span><span class="n">bag_button</span><span class="p">,</span> <span class="n">bag_output</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">bag_output</span><span class="p">:</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">Latex</span><span class="p">(</span><span class="n">conv_latex</span><span class="p">(</span><span class="n">marbles</span><span class="p">)))</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">Latex</span><span class="p">(</span><span class="n">conv_normalised_latex</span><span class="p">(</span><span class="n">marbles</span><span class="p">)))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+  <div class="output_subarea output_widget_view ">
+    <button class="js-nbinteract-widget">
+      Loading widgets...
+    </button>
+  </div>
+
+</div>
+
+<div class="output_area">
+
+    
+
+
+
+  <div class="output_subarea output_widget_view ">
+    <button class="js-nbinteract-widget">
+      Loading widgets...
+    </button>
+  </div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Channels">Channels<a class="anchor-link" href="#Channels">&#182;</a></h2><h3 id="Biased-dice-with-channels">Biased dice with channels<a class="anchor-link" href="#Biased-dice-with-channels">&#182;</a></h3><p>Recall the example <a href="#Biased-dice-functorality">Biased dice functorality</a> in which we used the functorality of $\mathcal{M}$ to change the fair $D6$ to a fair coin flip. This same thing can be done with channels as well. However, we will slightly change the morphism. Suppose that where the dice is rolled it is dark, and $\frac{1}{10}$ times we observe wrongly if the number is even or odd. Let's define this as a $\mathcal{D}$-channel $c$:</p>
+$$
+\begin{align*} 
+c &amp;: D6\multimap\mspace{-3mu}\rightarrow C  \\
+c(x) &amp;= \left\{
+\begin{array}{ll}
+  \frac{1}{10}|T\rangle + \frac{9}{10}|H\rangle \ \text{if}\ x\ \text{is even}\\
+  \frac{9}{10}|T\rangle + \frac{1}{10}|H\rangle\ \text{otherwise}
+\end{array}
+\right.
+\end{align*}
+$$<p>Now take $\omega$ to be $\frac{1}{6}|1\rangle + \frac{1}{6}|2\rangle + \frac{1}{6}|3\rangle + \frac{1}{6}|4\rangle + \frac{1}{6}|5\rangle + \frac{1}{6}|6\rangle$, then we compute $c \gg \omega$:</p>
+$$
+\begin{align*} 
+    c \gg \omega &amp;= (flat \circ \mathcal{D}(c))(\omega)\\
+    &amp;= flat(\mathcal{D}(c)(\omega)) \\
+    &amp;= flat(c(\tfrac{1}{6}|1\rangle) + c(\tfrac{1}{6}|2\rangle) + c(\tfrac{1}{6}|3\rangle) + c(\tfrac{1}{6}|4\rangle) + c(\tfrac{1}{6}|5\rangle) + c(\tfrac{1}{6}|6\rangle)\\
+    &amp;= flat\left( \frac{1}{6}\left|\tfrac{9}{10}|T\rangle + \tfrac{1}{10}|H\rangle\right\rangle + \frac{1}{6}\left|\tfrac{1}{10}|T\rangle + \tfrac{9}{10}|H\rangle\right\rangle + \frac{1}{6}\left|\tfrac{9}{10}|T\rangle + \tfrac{1}{10}|H\rangle\right\rangle + \frac{1}{6}\left|\tfrac{1}{10}|T\rangle + \tfrac{9}{10}|H\rangle\right\rangle + \frac{1}{6}\left|\tfrac{9}{10}|T\rangle + \tfrac{1}{10}|H\rangle\right\rangle + \frac{1}{6}\left|\tfrac{1}{10}|T\rangle + \tfrac{9}{10}|H\rangle\right\rangle \right) \\
+    &amp;= \tfrac{3}{20}|T\rangle + \tfrac{1}{60}|H\rangle + \tfrac{1}{60}|T\rangle + \tfrac{3}{20}|H\rangle + \tfrac{3}{20}|T\rangle + \tfrac{1}{60}|H\rangle + \tfrac{1}{60}|T\rangle + \tfrac{3}{20}|H\rangle + \tfrac{3}{20}|T\rangle + \tfrac{1}{60}|H\rangle + \tfrac{1}{60}|T\rangle + \tfrac{3}{20}|H\rangle \\
+    &amp;= \tfrac{30}{60}|T\rangle + \tfrac{30}{60}|H\rangle \\
+    &amp;= \tfrac{1}{2}|T\rangle + \tfrac{1}{2}|H\rangle
+\end{align*}
+$$<p>It is visible from this calculation that even though we have an imperfect observation of whether we roll an even or an odd number in the end it doesn't matter for the final chance. However, this changes when we use a weighted dice. Recall $w$ from <a href="#Biased-dice-functorality">Biased dice functorality</a>, we'll use this again, but this time in combination with $c$.</p>
+
+</div>
+</div>
+</div>
+
+  
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">ipywidgets</span> <span class="k">import</span> <span class="n">interactive_output</span><span class="p">,</span> <span class="n">FloatSlider</span>
+<span class="kn">from</span> <span class="nn">decimal</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">IPython.display</span> <span class="k">as</span> <span class="nn">d</span>
+<span class="kn">import</span> <span class="nn">nbinteract</span> <span class="k">as</span> <span class="nn">nbi</span>
+
+<span class="c1"># Round down decimals to 4 positions</span>
+<span class="n">getcontext</span><span class="p">()</span><span class="o">.</span><span class="n">prec</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="n">wc_rSlider</span> <span class="o">=</span> <span class="n">FloatSlider</span><span class="p">(</span>
+    <span class="n">value</span><span class="o">=</span><span class="mf">0.00</span><span class="p">,</span>
+    <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="nb">max</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">step</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s1">&#39;$$r:=$$&#39;</span>
+<span class="p">)</span>
+
+<span class="n">wc_coin_options</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Chance for Heads or Tails&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ylabel&#39;</span><span class="p">:</span> <span class="s1">&#39;Chance between 0 and 1 with 1 being 100%&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ylim&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.00</span><span class="p">,</span> <span class="mf">1.01</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="n">wc_dice_options</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Weighted 6-sided dice&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ylabel&#39;</span><span class="p">:</span> <span class="s1">&#39;Chance between 0 and 1 with 1 being 100%&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ylim&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.00</span><span class="p">,</span> <span class="mf">1.01</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">wc_flip</span><span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+    <span class="n">chance</span> <span class="o">=</span> <span class="p">(</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">wc_weighted_dice</span><span class="p">(</span><span class="n">r</span><span class="p">)):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">wc_c</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">chance</span> <span class="o">=</span> <span class="p">((</span><span class="n">val</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="n">chance</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="n">val</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="n">chance</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">chance</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">chance</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="k">def</span> <span class="nf">wc_c</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span><span class="o">/</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span><span class="o">/</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">wc_dice</span><span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+    <span class="n">ret_value</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">wc_weighted_dice</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
+        <span class="n">ret_value</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">ret_value</span>
+
+<span class="k">def</span> <span class="nf">wc_weighted_dice</span><span class="p">(</span><span class="n">r</span><span class="p">):</span>
+    <span class="n">ret_value</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">rdivfive</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="o">/</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">pip</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">7</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">pip</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+            <span class="n">ret_value</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="n">Decimal</span><span class="p">(</span><span class="n">r</span><span class="p">))</span><span class="o">/</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ret_value</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">-</span><span class="n">rdivfive</span><span class="p">)</span><span class="o">/</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">ret_value</span>
+
+<span class="k">def</span> <span class="nf">wc_disp</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="n">coin</span> <span class="o">=</span> <span class="n">wc_flip</span><span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">Latex</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;$c \gg w(&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;) = &quot;</span> <span class="o">+</span> 
+                          <span class="nb">str</span><span class="p">(</span><span class="n">Decimal</span><span class="p">(</span><span class="n">coin</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">quantize</span><span class="p">(</span><span class="n">Decimal</span><span class="p">(</span><span class="s1">&#39;.001&#39;</span><span class="p">),</span> <span class="n">rounding</span><span class="o">=</span><span class="n">ROUND_HALF_DOWN</span><span class="p">))</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;|T\rangle + &quot;</span> <span class="o">+</span>
+                          <span class="nb">str</span><span class="p">(</span><span class="n">Decimal</span><span class="p">(</span><span class="n">coin</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">quantize</span><span class="p">(</span><span class="n">Decimal</span><span class="p">(</span><span class="s1">&#39;.001&#39;</span><span class="p">),</span> <span class="n">rounding</span><span class="o">=</span><span class="n">ROUND_HALF_DOWN</span><span class="p">))</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;|H\rangle $&quot;</span><span class="p">))</span>
+    
+    <span class="n">dice</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;$w(&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;) = &quot;</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">wc_weighted_dice</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>
+        <span class="n">dice</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;|&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;\rangle + &quot;</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">Latex</span><span class="p">(</span><span class="n">dice</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;$&quot;</span><span class="p">))</span>
+
+<span class="n">d</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">nbi</span><span class="o">.</span><span class="n">bar</span><span class="p">([</span><span class="s1">&#39;Tails&#39;</span><span class="p">,</span> <span class="s1">&#39;Heads&#39;</span><span class="p">],</span> <span class="n">wc_flip</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="n">wc_rSlider</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">wc_coin_options</span><span class="p">))</span>
+<span class="n">d</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">nbi</span><span class="o">.</span><span class="n">bar</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">],</span> <span class="n">wc_dice</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="n">wc_rSlider</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">wc_dice_options</span><span class="p">))</span>
+<span class="n">d</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">interactive_output</span><span class="p">(</span><span class="n">wc_disp</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="n">wc_rSlider</span><span class="p">}))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    
+
+
+
+  <div class="output_subarea output_widget_view ">
+    <button class="js-nbinteract-widget">
+      Loading widgets...
+    </button>
+  </div>
+
+</div>
+
+<div class="output_area">
+
+    
+
+
+
+  <div class="output_subarea output_widget_view ">
+    <button class="js-nbinteract-widget">
+      Loading widgets...
+    </button>
+  </div>
+
+</div>
+
+<div class="output_area">
+
+    
+
+
+
+  <div class="output_subarea output_widget_view ">
+    <button class="js-nbinteract-widget">
+      Loading widgets...
+    </button>
+  </div>
+
+</div>
+
+</div>
+</div>
+
+  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>When the value of $r$ is different than $0$, i.e. the result of $w$ is no longer uniform, the imperfection in the observation matters. It will now never be the case that there is $100%$ guarantee to get an even number or 'heads'. This is because of the way $flat$ functions. Take $w(5.0)$ which is $0|1\rangle + 0|2\rangle + 0|3\rangle + 0|4\rangle + 0|5\rangle + 1|6\rangle$ and let's compute $c \gg w(5.0)$:</p>
+$$
+\begin{align*} 
+    c \gg w(5.0) &amp;= (flat \circ \mathcal{D}(c))(w(5.0))\\
+    &amp;= (flat \circ \mathcal{D}(c))(0|1\rangle + 0|2\rangle + 0|3\rangle + 0|4\rangle + 0|5\rangle + 1|6\rangle) \\
+    &amp;= flat\left(0\left|\tfrac{9}{10}|T\rangle + \tfrac{1}{10}|H\rangle\right\rangle + 0\left|\tfrac{1}{10}|T\rangle + \tfrac{9}{10}|H\rangle\right\rangle + 0\left|\tfrac{9}{10}|T\rangle + \tfrac{1}{10}|H\rangle\right\rangle + 0\left|\tfrac{1}{10}|T\rangle + \tfrac{9}{10}|H\rangle\right\rangle + 0\left|\tfrac{9}{10}|T\rangle + \tfrac{1}{10}|H\rangle\right\rangle + 1\left|\tfrac{1}{10}|T\rangle + \tfrac{9}{10}|H\rangle\right\rangle\right) \\
+    &amp;= 0\cdot\tfrac{9}{10}|T\rangle + 0\cdot\tfrac{1}{10}|H\rangle + 0\cdot\tfrac{1}{10}|T\rangle + 0\cdot\tfrac{9}{10}|H\rangle + 0\cdot\tfrac{9}{10}|T\rangle + 0\cdot\tfrac{1}{10}|H\rangle \\ &amp;\ \ \ \ + 0\cdot\tfrac{1}{10}|T\rangle + 0\cdot\tfrac{9}{10}|H\rangle + 0\cdot\tfrac{9}{10}|T\rangle + 0\cdot\tfrac{1}{10}|H\rangle + 1\cdot\tfrac{1}{10}|T\rangle + 1\cdot\tfrac{9}{10}|H\rangle\\
+    &amp;= \tfrac{1}{10}|T\rangle + \tfrac{9}{10}|H\rangle
+\end{align*}
+$$<p>Observe how the inner probabilities are affected by the outer probabilities due to the $flat$ function. This means that since on a perfectly weighted dice we will only roll a $6$ our observation will always be $\tfrac{1}{10}|T\rangle + \tfrac{9}{10}|H\rangle$.</p>
+<h3 id="Test">Test<a class="anchor-link" href="#Test">&#182;</a></h3><p><link rel="stylesheet" type="text/css" href="http://tikzjax.com/v1/fonts.css"></p>
+<script src="http://tikzjax.com/v1/tikzjax.js"></script>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Parallel-products">Parallel products<a class="anchor-link" href="#Parallel-products">&#182;</a></h2><h3 id="Parallel-dices">Parallel dices<a class="anchor-link" href="#Parallel-dices">&#182;</a></h3><p>Suppose for some reason we want someone to roll a dice that contains $100$ possible numbers on it (i.e. the roller has a $1$ in $100$ chance for each number). Such dices exist, but in reality they take a while to land on a face since they are almost spherical. Let's say we don't have a $100$ sided dice, but we do have a $10$-sided dice, a d10. We can represent all faces on the dice as the following set $D10 := \{0,1,2,3,4,5,6,7,8,9\}$. Rolling such a dice can be represented by the following uniform probability distribution:</p>
+$$\tau = \frac{1}{10}|0\rangle + \frac{1}{10}|1\rangle + \frac{1}{10}|2\rangle + \frac{1}{10}|3\rangle + \frac{1}{10}|4\rangle + \frac{1}{10}|5\rangle + \frac{1}{10}|6\rangle + \frac{1}{10}|7\rangle + \frac{1}{10}|8\rangle + \frac{1}{10}|9\rangle$$<p>We now want to use this dice to create a uniform probability distribution in which every possibility has a $\frac{1}{100}$ chance. Intuitively this is easy, just roll the d10 twice and you get $100$ different combinations. In case you would like to translate this to the number sequence $[1..100]$ you can use the following:</p>
+$$ 
+0, 1 = 1\\
+0, 2 = 2\\
+...\\
+0, 9 = 9\\
+0, 0 = 10\\
+1, 1 = 11\\
+...\\
+1, 0 = 20\\
+9, 0 = 100
+$$<p>To now represent this in a multiset we can compute the parallel product of $\tau$ with itself, $\tau \otimes \tau$, as follows:</p>
+$$\begin{eqnarray*}
+\tau\otimes\tau &amp;=&amp; \sum_{x,y} (\tau(x) \cdot \tau(y))|x,y\rangle\\
+&amp;=&amp; (\tau(0)\cdot\tau(0))|0,0\rangle + (\tau(0)\cdot\tau(1))|0,1\rangle +\ ...\ + (\tau(9)\cdot\tau(9))|9,9\rangle\\
+&amp;=&amp; \frac{1}{100}|0,0\rangle + \frac{1}{100}|0,1\rangle +\ ...\ + \frac{1}{100}|9,9\rangle
+\end{eqnarray*}$$
+</div>
+</div>
+</div>
+
+  
+
+  <div class="
+      cell border-box-sizing code_cell rendered">
+    <div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span> 
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+  </div>
 
   
 

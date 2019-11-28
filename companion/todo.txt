@@ -8,3 +8,6 @@
 
 
 Vooral voorbeeeldne
+
+Vragen:
+- 1.7.1 2 d o c: X->Y fout?
