@@ -21,3 +21,6 @@ The custom.js file should be placed in the folder ~/.jupyter/custom and if Jupyt
 
 ### Important
 It is recommended to test your Tikz code before attempting to put it in your notebook. This is because if the library is unable to compile it, it will get stuck and start using a lot of ram. When this happens just deactivate the code and restart your browser. To see whether the library can render the picture use the developer tools present on your browser, namely the console.
+
+### Greek alphabet
+It isn't possible the use the greek alphabet in the Tikz pictures. Why this is the case is unknown.
