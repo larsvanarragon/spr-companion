@@ -9,5 +9,10 @@
 
 Vooral voorbeeeldne
 
-Vragen:
-- 1.7.1 2 d o c: X->Y fout?
+
+- with 0 representations efprob
+- 1.9 with copy
+- latex friendly naar kijken
+
+H2
+- Vooral bayesian voorbeelden

@@ -1,5 +1,5 @@
 var loadedTikzJax = false;
-var tikzJaxBusy = false;
+var timer;
 
 // Anonymous "self-invoking" function
 (function() {
@@ -25,13 +25,12 @@ $('body').on("DOMSubtreeModified", function() {
     var tikzScripts = Array.prototype.slice.call(scripts).filter(
         (e) => (e.getAttribute('type') === 'text/tikz'));
     
-    if (tikzScripts.length > 0 && loadedTikzJax && !tikzJaxBusy) {
-        tikzJaxBusy = true;
-        doExecuteTikz();
+    if (tikzScripts.length > 0 && loadedTikzJax) {
+        clearTimeout(timer);
+        timer = setTimeout(doExecuteTikz, 1000);
     }
 });
 
 async function doExecuteTikz() {
     await window.onload();
-    tikzJaxBusy = false;    
 }
