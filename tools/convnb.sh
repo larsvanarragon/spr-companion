@@ -56,6 +56,13 @@ if [ ! -f "$UL_TEMPLATE_FILE" ]; then
     exit 1
 fi
 
+# Load in template html for custom imports
+IMP_TEMPLATE_FILE="${DIR}/${TEMPLATE_FOLDER}/imports.html"
+if [ ! -f "$IMP_TEMPLATE_FILE" ]; then
+	printf "The template file ${IMP_TEMPLATE_FILE} is missing, please redownload it from GitHub\n"
+    exit 1
+fi
+
 ## CONVERT NOTEBOOK ##
 printf "Converting $NOTEBOOK to HTML using nbinteract\n"
 
@@ -78,6 +85,7 @@ fi
 
 printf "Adding template data to ${NB_BASE}.html\n"
 
+sed -i -e "/<head>/r ${IMP_TEMPLATE_FILE}" ${NB_BASE}.html
 sed -i -e "/<body>/r ${UL_TEMPLATE_FILE}" ${NB_BASE}.html
 sed -i -e "/<body>/r ${HCB_TEMPLATE_FILE}" ${NB_BASE}.html
 
