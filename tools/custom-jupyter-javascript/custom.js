@@ -6,7 +6,7 @@ var timer;
     var startingTime = new Date().getTime();
     // Load the script
     var script = document.createElement("SCRIPT");
-    script.src = 'http://tikzjax.com/v1/tikzjax.js';
+    script.src = 'https://tikzjax.com/v1/tikzjax.js';
     script.type = 'text/javascript';
     script.onload = function() {
     	var $ = window.jQuery;
